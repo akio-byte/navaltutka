@@ -1,16 +1,16 @@
 {
-  "apiVersion": "1.0",
-  "generatedAtUtc": "2026-02-18T06:00:00Z",
+  "apiVersion": "1.1",
+  "generatedAtUtc": "2026-02-18T09:00:00Z",
   "items": [
     {
       "id": "item-001",
       "category": "US_NAVAL",
-      "title": "USS Abraham Lincoln CSG Relocated",
-      "summary": "Carrier Strike Group 3 has moved from the Red Sea to the Northern Arabian Sea, positioning for potential air operations over the Gulf.",
+      "title": "USS Abraham Lincoln CSG siirretty",
+      "summary": "Lentotukialusryhmä 3 on siirtynyt Punaiseltamereltä Pohjois-Arabianmerelle, valmistautuen mahdollisiin ilmaoperaatioihin Persianlahden alueella.",
       "location": {
         "lat": 20.5,
         "lon": 63.2,
-        "name": "Northern Arabian Sea"
+        "name": "Pohjois-Arabianmeri"
       },
       "timeWindow": {
         "start": "2026-02-17T14:00:00Z",
@@ -22,25 +22,27 @@
         {
           "name": "USNI News Fleet Tracker",
           "url": "https://news.usni.org",
-          "publishedAtUtc": "2026-02-17T20:00:00Z"
+          "publishedAtUtc": "2026-02-17T20:00:00Z",
+          "reliability": 95
         },
         {
-          "name": "Satellite Imagery (Sentinel-2)",
+          "name": "Satelliittikuva (Sentinel-2)",
           "url": "",
-          "publishedAtUtc": "2026-02-17T16:30:00Z"
+          "publishedAtUtc": "2026-02-17T16:30:00Z",
+          "reliability": 98
         }
       ],
-      "tags": ["naval", "carrier", "US"]
+      "tags": ["merivoimat", "tukialus", "US"]
     },
     {
       "id": "item-002",
       "category": "IRAN",
-      "title": "Ballistic Missile Launcher Movement",
-      "summary": "Increased activity detected at Tabriz missile bases. Several TELs (Transporter Erector Launchers) observed moving from storage bunkers to launch positions.",
+      "title": "Ballististen ohjusten siirtoja havaittu",
+      "summary": "Lisääntynyttä aktiivisuutta Tabrizin ohjustukikohdassa. Useita TEL-ajoneuvoja (Transporter Erector Launcher) havaittu siirtymässä varastoista laukaisuasemiin.",
       "location": {
         "lat": 38.0962,
         "lon": 46.2738,
-        "name": "Tabriz Missile Base"
+        "name": "Tabrizin ohjustukikohta"
       },
       "timeWindow": {
         "start": "2026-02-17T08:00:00Z",
@@ -50,22 +52,23 @@
       "confidence": 0.85,
       "sources": [
         {
-          "name": "OpenSource Intel Twitter",
+          "name": "OSINT-yhteisö (Twitter)",
           "url": "https://twitter.com/example",
-          "publishedAtUtc": "2026-02-17T10:15:00Z"
+          "publishedAtUtc": "2026-02-17T10:15:00Z",
+          "reliability": 60
         }
       ],
-      "tags": ["missile", "IRGC", "ground"]
+      "tags": ["ohjus", "IRGC", "maavoimat"]
     },
     {
       "id": "item-003",
       "category": "DIPLOMACY",
-      "title": "Emergency UN Security Council Meeting",
-      "summary": "France and UK have called for an emergency meeting regarding the recent escalation in the Strait of Hormuz.",
+      "title": "YK:n turvallisuusneuvoston hätäkokous",
+      "summary": "Ranska ja Iso-Britannia ovat kutsuneet koolle hätäkokouksen Hormuzinsalmen tilanteen kiristymisen vuoksi.",
       "location": {
         "lat": 40.7489,
         "lon": -73.9680,
-        "name": "UN Headquarters, NY"
+        "name": "YK:n päämaja, NY"
       },
       "timeWindow": {
         "start": "2026-02-18T14:00:00Z",
@@ -77,20 +80,21 @@
         {
           "name": "Reuters",
           "url": "https://reuters.com",
-          "publishedAtUtc": "2026-02-18T04:00:00Z"
+          "publishedAtUtc": "2026-02-18T04:00:00Z",
+          "reliability": 90
         }
       ],
-      "tags": ["diplomacy", "UN"]
+      "tags": ["diplomatia", "YK"]
     },
     {
       "id": "item-004",
       "category": "PROXIES",
-      "title": "Houthi Drone Launch Intercepted",
-      "summary": "US Destroyer intercepted 3 UAVs launched from Houthi-controlled areas in Yemen targeting commercial shipping in the Red Sea.",
+      "title": "Huthien lennokki-isku torjuttu",
+      "summary": "Yhdysvaltain hävittäjä torjui kolme Huthien hallitsemalta alueelta Jemenistä laukaistua lennokkia, jotka uhkasivat kauppamerenkulkua Punaisellamerellä.",
       "location": {
         "lat": 14.5,
         "lon": 42.5,
-        "name": "Red Sea"
+        "name": "Punainenmeri"
       },
       "timeWindow": {
         "start": "2026-02-16T23:00:00Z",
@@ -100,22 +104,23 @@
       "confidence": 0.9,
       "sources": [
         {
-          "name": "CENTCOM Statement",
+          "name": "CENTCOM Tiedote",
           "url": "https://centcom.mil",
-          "publishedAtUtc": "2026-02-17T02:00:00Z"
+          "publishedAtUtc": "2026-02-17T02:00:00Z",
+          "reliability": 95
         }
       ],
-      "tags": ["uav", "houthi", "red sea"]
+      "tags": ["lennokki", "huthit", "punainenmeri"]
     },
     {
       "id": "item-005",
       "category": "US_AIR",
-      "title": "F-35 Squadron Deployment",
-      "summary": "Additional squadron of F-35s arrived at Al Dhafra Air Base, UAE, reinforcing regional air superiority capabilities.",
+      "title": "F-35 -laivueen sijoittaminen",
+      "summary": "Lisälaivue F-35 -hävittäjiä on saapunut Al Dhafran lentotukikohtaan Arabiemiraatteihin vahvistamaan alueellista ilmapuolustusta.",
       "location": {
         "lat": 24.2482,
         "lon": 54.5477,
-        "name": "Al Dhafra Air Base"
+        "name": "Al Dhafran lentotukikohta"
       },
       "timeWindow": {
         "start": "2026-02-15T10:00:00Z",
@@ -127,20 +132,21 @@
         {
           "name": "Air Force Times",
           "url": "https://airforcetimes.com",
-          "publishedAtUtc": "2026-02-16T09:00:00Z"
+          "publishedAtUtc": "2026-02-16T09:00:00Z",
+          "reliability": 85
         }
       ],
-      "tags": ["air force", "deployment", "UAE"]
+      "tags": ["ilmavoimat", "sijoitus", "UAE"]
     },
     {
       "id": "item-006",
       "category": "ISRAEL",
-      "title": "Northern Border Reinforcement",
-      "summary": "IDF moving additional armored brigades to the northern border with Lebanon in response to Hezbollah rhetoric.",
+      "title": "Pohjoisrajan vahvistaminen",
+      "summary": "IDF siirtää lisää panssariprikaateja Libanonin vastaiselle rajalle vastauksena Hizbollahin retoriikkaan.",
       "location": {
         "lat": 33.09,
         "lon": 35.5,
-        "name": "Northern Israel"
+        "name": "Pohjois-Israel"
       },
       "timeWindow": {
         "start": "2026-02-17T05:00:00Z",
@@ -152,20 +158,21 @@
         {
           "name": "Haaretz",
           "url": "https://haaretz.com",
-          "publishedAtUtc": "2026-02-17T12:00:00Z"
+          "publishedAtUtc": "2026-02-17T12:00:00Z",
+          "reliability": 80
         }
       ],
-      "tags": ["ground", "IDF", "border"]
+      "tags": ["maavoimat", "IDF", "raja"]
     },
     {
       "id": "item-007",
       "category": "REGIONAL",
-      "title": "Saudi-Iran Diplomatic Channel Active",
-      "summary": "Unconfirmed reports of back-channel talks between Saudi and Iranian officials in Baghdad to de-escalate tensions.",
+      "title": "Saudi-Arabian ja Iranin diplomaattikanava",
+      "summary": "Vahvistamattomia raportteja Saudi-Arabian ja Iranin virkamiesten välisistä taustakeskusteluista Bagdadissa jännitteiden lieventämiseksi.",
       "location": {
         "lat": 33.3152,
         "lon": 44.3661,
-        "name": "Baghdad, Iraq"
+        "name": "Bagdad, Irak"
       },
       "timeWindow": {
         "start": "2026-02-16T00:00:00Z",
@@ -175,18 +182,19 @@
       "confidence": 0.6,
       "sources": [
         {
-          "name": "Regional Analyst Blog",
+          "name": "Alueellinen analyytikkoblogi",
           "url": "",
-          "publishedAtUtc": "2026-02-17T18:00:00Z"
+          "publishedAtUtc": "2026-02-17T18:00:00Z",
+          "reliability": 40
         }
       ],
-      "tags": ["diplomacy", "saudi", "iran"]
+      "tags": ["diplomatia", "saudi", "iran"]
     },
     {
       "id": "item-008",
       "category": "US_BASES",
-      "title": "Force Protection Level Raised",
-      "summary": "FPCON raised to Charlie at US bases in Kuwait and Bahrain due to credible intelligence of imminent threats.",
+      "title": "Valmiustason nosto tukikohdissa",
+      "summary": "FPCON-taso nostettu Charlie-tasolle Yhdysvaltain tukikohdissa Kuwaitissa ja Bahrainissa uskottavan uhkatiedustelun vuoksi.",
       "location": {
         "lat": 26.2285,
         "lon": 50.5860,
@@ -200,12 +208,65 @@
       "confidence": 0.98,
       "sources": [
         {
-          "name": "Internal Memo Leak",
+          "name": "Vuotanut sisäinen muistio",
           "url": "",
-          "publishedAtUtc": "2026-02-18T03:00:00Z"
+          "publishedAtUtc": "2026-02-18T03:00:00Z",
+          "reliability": 70
         }
       ],
-      "tags": ["alert", "security", "bases"]
+      "tags": ["hälytys", "turvallisuus", "tukikohdat"]
+    },
+    {
+      "id": "item-009",
+      "category": "REGIONAL",
+      "title": "Kyberturvallisuusvaroitus energiasektorille",
+      "summary": "Kriittiseen infrastruktuuriin kohdistuva kohdennettu kalastelukampanja havaittu Qatarin ja UAE:n energiasektoreilla.",
+      "location": {
+        "lat": 25.3548,
+        "lon": 51.1839,
+        "name": "Doha, Qatar"
+      },
+      "timeWindow": {
+        "start": "2026-02-18T07:00:00Z",
+        "end": "2026-02-18T12:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.82,
+      "sources": [
+        {
+          "name": "Kyberturvallisuusyhtiön raportti",
+          "url": "",
+          "publishedAtUtc": "2026-02-18T08:30:00Z",
+          "reliability": 85
+        }
+      ],
+      "tags": ["kyber", "energia", "infrastruktuuri"]
+    },
+    {
+      "id": "item-010",
+      "category": "US_NAVAL",
+      "title": "Amfibioalusryhmän huoltokäynti",
+      "summary": "USS Bataan (LHD-5) saapunut Jebel Alin satamaan suunnitellulle huolto- ja lepokäynnille.",
+      "location": {
+        "lat": 24.9857,
+        "lon": 55.0275,
+        "name": "Jebel Ali, UAE"
+      },
+      "timeWindow": {
+        "start": "2026-02-18T05:00:00Z",
+        "end": "2026-02-21T00:00:00Z"
+      },
+      "observed": true,
+      "confidence": 1.0,
+      "sources": [
+        {
+          "name": "Satamaviranomaiset",
+          "url": "",
+          "publishedAtUtc": "2026-02-18T06:00:00Z",
+          "reliability": 100
+        }
+      ],
+      "tags": ["merivoimat", "huolto", "US"]
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "MENA Force Posture Monitor",
-  "description": "Lapland AI Lab demo: Monitoring force posture in the MENA region.",
+  "name": "MENA Tilannekuva (Lapland AI Lab)",
+  "description": "Lapland AI Lab demo: Lähi-idän ja Pohjois-Afrikan voimatasapainon seuranta.",
   "requestFramePermissions": []
 }

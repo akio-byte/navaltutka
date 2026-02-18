@@ -12,6 +12,7 @@ export interface Source {
   name: string;
   url?: string;
   publishedAtUtc: string;
+  reliability?: number; // 0-100 score
 }
 
 export interface Location {

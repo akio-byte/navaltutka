@@ -8,14 +8,24 @@
   --color-slate-400: #94a3b8;
   --color-slate-200: #e2e8f0;
   
+  --color-ice-blue: #67e8f9;
+  --color-ice-blue-dim: #0e7490;
+  
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  
+  --animate-fade-in: fadeIn 0.5s ease-out forwards;
 }
 
 @layer base {
   body {
     @apply bg-slate-950 text-slate-200 antialiased;
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .leaflet-container {
@@ -25,21 +35,42 @@
   background: #0f172a;
 }
 
-/* Custom Scrollbar for Webkit */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a; 
+  background: #020617; 
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155; 
-  border-radius: 4px;
+  background: #1e293b; 
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569; 
+  background: #334155; 
+}
+
+/* Leaflet Cluster Customization */
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 50%;
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+  background-color: rgba(14, 116, 144, 0.8);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  line-height: 30px;
 }
