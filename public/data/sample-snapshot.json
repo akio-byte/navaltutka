@@ -1,0 +1,211 @@
+{
+  "apiVersion": "1.0",
+  "generatedAtUtc": "2026-02-18T06:00:00Z",
+  "items": [
+    {
+      "id": "item-001",
+      "category": "US_NAVAL",
+      "title": "USS Abraham Lincoln CSG Relocated",
+      "summary": "Carrier Strike Group 3 has moved from the Red Sea to the Northern Arabian Sea, positioning for potential air operations over the Gulf.",
+      "location": {
+        "lat": 20.5,
+        "lon": 63.2,
+        "name": "Northern Arabian Sea"
+      },
+      "timeWindow": {
+        "start": "2026-02-17T14:00:00Z",
+        "end": "2026-02-18T06:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.95,
+      "sources": [
+        {
+          "name": "USNI News Fleet Tracker",
+          "url": "https://news.usni.org",
+          "publishedAtUtc": "2026-02-17T20:00:00Z"
+        },
+        {
+          "name": "Satellite Imagery (Sentinel-2)",
+          "url": "",
+          "publishedAtUtc": "2026-02-17T16:30:00Z"
+        }
+      ],
+      "tags": ["naval", "carrier", "US"]
+    },
+    {
+      "id": "item-002",
+      "category": "IRAN",
+      "title": "Ballistic Missile Launcher Movement",
+      "summary": "Increased activity detected at Tabriz missile bases. Several TELs (Transporter Erector Launchers) observed moving from storage bunkers to launch positions.",
+      "location": {
+        "lat": 38.0962,
+        "lon": 46.2738,
+        "name": "Tabriz Missile Base"
+      },
+      "timeWindow": {
+        "start": "2026-02-17T08:00:00Z",
+        "end": "2026-02-17T22:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.85,
+      "sources": [
+        {
+          "name": "OpenSource Intel Twitter",
+          "url": "https://twitter.com/example",
+          "publishedAtUtc": "2026-02-17T10:15:00Z"
+        }
+      ],
+      "tags": ["missile", "IRGC", "ground"]
+    },
+    {
+      "id": "item-003",
+      "category": "DIPLOMACY",
+      "title": "Emergency UN Security Council Meeting",
+      "summary": "France and UK have called for an emergency meeting regarding the recent escalation in the Strait of Hormuz.",
+      "location": {
+        "lat": 40.7489,
+        "lon": -73.9680,
+        "name": "UN Headquarters, NY"
+      },
+      "timeWindow": {
+        "start": "2026-02-18T14:00:00Z",
+        "end": "2026-02-18T16:00:00Z"
+      },
+      "observed": true,
+      "confidence": 1.0,
+      "sources": [
+        {
+          "name": "Reuters",
+          "url": "https://reuters.com",
+          "publishedAtUtc": "2026-02-18T04:00:00Z"
+        }
+      ],
+      "tags": ["diplomacy", "UN"]
+    },
+    {
+      "id": "item-004",
+      "category": "PROXIES",
+      "title": "Houthi Drone Launch Intercepted",
+      "summary": "US Destroyer intercepted 3 UAVs launched from Houthi-controlled areas in Yemen targeting commercial shipping in the Red Sea.",
+      "location": {
+        "lat": 14.5,
+        "lon": 42.5,
+        "name": "Red Sea"
+      },
+      "timeWindow": {
+        "start": "2026-02-16T23:00:00Z",
+        "end": "2026-02-17T01:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.9,
+      "sources": [
+        {
+          "name": "CENTCOM Statement",
+          "url": "https://centcom.mil",
+          "publishedAtUtc": "2026-02-17T02:00:00Z"
+        }
+      ],
+      "tags": ["uav", "houthi", "red sea"]
+    },
+    {
+      "id": "item-005",
+      "category": "US_AIR",
+      "title": "F-35 Squadron Deployment",
+      "summary": "Additional squadron of F-35s arrived at Al Dhafra Air Base, UAE, reinforcing regional air superiority capabilities.",
+      "location": {
+        "lat": 24.2482,
+        "lon": 54.5477,
+        "name": "Al Dhafra Air Base"
+      },
+      "timeWindow": {
+        "start": "2026-02-15T10:00:00Z",
+        "end": "2026-02-15T18:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.92,
+      "sources": [
+        {
+          "name": "Air Force Times",
+          "url": "https://airforcetimes.com",
+          "publishedAtUtc": "2026-02-16T09:00:00Z"
+        }
+      ],
+      "tags": ["air force", "deployment", "UAE"]
+    },
+    {
+      "id": "item-006",
+      "category": "ISRAEL",
+      "title": "Northern Border Reinforcement",
+      "summary": "IDF moving additional armored brigades to the northern border with Lebanon in response to Hezbollah rhetoric.",
+      "location": {
+        "lat": 33.09,
+        "lon": 35.5,
+        "name": "Northern Israel"
+      },
+      "timeWindow": {
+        "start": "2026-02-17T05:00:00Z",
+        "end": "2026-02-17T15:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.88,
+      "sources": [
+        {
+          "name": "Haaretz",
+          "url": "https://haaretz.com",
+          "publishedAtUtc": "2026-02-17T12:00:00Z"
+        }
+      ],
+      "tags": ["ground", "IDF", "border"]
+    },
+    {
+      "id": "item-007",
+      "category": "REGIONAL",
+      "title": "Saudi-Iran Diplomatic Channel Active",
+      "summary": "Unconfirmed reports of back-channel talks between Saudi and Iranian officials in Baghdad to de-escalate tensions.",
+      "location": {
+        "lat": 33.3152,
+        "lon": 44.3661,
+        "name": "Baghdad, Iraq"
+      },
+      "timeWindow": {
+        "start": "2026-02-16T00:00:00Z",
+        "end": "2026-02-18T00:00:00Z"
+      },
+      "observed": false,
+      "confidence": 0.6,
+      "sources": [
+        {
+          "name": "Regional Analyst Blog",
+          "url": "",
+          "publishedAtUtc": "2026-02-17T18:00:00Z"
+        }
+      ],
+      "tags": ["diplomacy", "saudi", "iran"]
+    },
+    {
+      "id": "item-008",
+      "category": "US_BASES",
+      "title": "Force Protection Level Raised",
+      "summary": "FPCON raised to Charlie at US bases in Kuwait and Bahrain due to credible intelligence of imminent threats.",
+      "location": {
+        "lat": 26.2285,
+        "lon": 50.5860,
+        "name": "NSA Bahrain"
+      },
+      "timeWindow": {
+        "start": "2026-02-18T02:00:00Z",
+        "end": "2026-02-18T02:00:00Z"
+      },
+      "observed": true,
+      "confidence": 0.98,
+      "sources": [
+        {
+          "name": "Internal Memo Leak",
+          "url": "",
+          "publishedAtUtc": "2026-02-18T03:00:00Z"
+        }
+      ],
+      "tags": ["alert", "security", "bases"]
+    }
+  ]
+}
