@@ -59,7 +59,7 @@ Keep answers short (under 100 words) unless asked for a detailed report.
 `;
 
       const result = await client.models.generateContent({
-        model: "gemini-2.0-flash-exp", // Using a stable model name
+        model: "gemini-3-flash-preview", // Using a stable model name
         contents: [
           { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
         ],

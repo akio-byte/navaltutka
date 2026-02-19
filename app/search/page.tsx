@@ -49,7 +49,7 @@ If no items are relevant, return [].
 `;
 
           const result = await client.models.generateContent({
-            model: "gemini-2.0-flash-exp",
+            model: "gemini-3-flash-preview",
             contents: [
               { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
             ],

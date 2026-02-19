@@ -38,7 +38,7 @@ Keep it under 3 sentences total. Concise.
 `;
 
       const result = await client.models.generateContent({
-        model: "gemini-2.0-flash-exp",
+        model: "gemini-3-flash-preview",
         contents: [
           { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
         ],
