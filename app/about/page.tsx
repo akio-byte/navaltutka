@@ -2,8 +2,9 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, AlertTriangle, Github, Snowflake } from 'lucide-react';
+import { Download, FileText, AlertTriangle, Github, Snowflake, Bot, Sparkles } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { getGeminiClient, SYSTEM_PROMPT } from '@/lib/ai-client';
 
 export default function AboutPage() {
   const handleDownloadSnapshot = () => {
@@ -12,13 +13,51 @@ export default function AboutPage() {
 
   const handleDownloadBrief = async () => {
     try {
-      const res = await fetch('/api/brief');
-      const text = await res.text();
-      await navigator.clipboard.writeText(text);
-      alert('Päivittäiskatsaus kopioitu leikepöydälle!');
+      const snapshotRes = await fetch('/api/snapshot');
+      const snapshot = await snapshotRes.json();
+
+      const client = getGeminiClient();
+      if (!client) {
+        throw new Error('AI client not configured');
+      }
+
+      const prompt = `
+Generate a polished, professional Daily Intelligence Brief based on this snapshot data.
+Snapshot: ${JSON.stringify(snapshot.items.map((i: any) => ({ t: i.title, c: i.category, s: i.summary })))}
+
+Format:
+# Daily Intelligence Brief - [Date]
+
+## Executive Summary
+[2-3 sentences]
+
+## Key Developments
+- **[Category]**: [Detail]
+- ...
+
+## Strategic Assessment
+[1 paragraph]
+
+Tone: Nordic, calm, objective, professional. Language: Finnish.
+`;
+
+      const result = await client.models.generateContent({
+        model: "gemini-2.0-flash-exp",
+        contents: [
+          { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
+        ],
+      });
+      
+      const text = result.text;
+      if (text) {
+        await navigator.clipboard.writeText(text);
+        alert('AI-generoitu päivittäiskatsaus kopioitu leikepöydälle!');
+      } else {
+        throw new Error('No response');
+      }
     } catch (e) {
       console.error(e);
-      alert('Kopiointi epäonnistui.');
+      alert('Kopiointi epäonnistui. Varmista API-avain.');
     }
   };
 
@@ -30,14 +69,14 @@ export default function AboutPage() {
     
     doc.setFontSize(12);
     doc.text(`Luotu: ${new Date().toLocaleString('fi-FI')}`, 20, 30);
-    doc.text('Lapland AI Lab Demo', 20, 36);
+    doc.text('Lapland AI Lab Demo v1.2', 20, 36);
     
     doc.setLineWidth(0.5);
     doc.line(20, 40, 190, 40);
     
     doc.setFontSize(10);
     doc.text('Tämä raportti on automaattisesti generoitu tilannekuvajärjestelmästä.', 20, 50);
-    doc.text('Tiedot ovat simuloituja ja tarkoitettu vain demonstraatiokäyttöön.', 20, 56);
+    doc.text('Sisältää Gemini AI:n tuottaman analyysin.', 20, 56);
     
     doc.save('mena-tilannekuva-raportti.pdf');
   };
@@ -50,15 +89,27 @@ export default function AboutPage() {
           <h1 className="text-3xl font-bold text-slate-100">Tietoa järjestelmästä</h1>
         </div>
         <p className="text-lg text-slate-400">
-          Lapland AI Lab Demo Project – Arctic Intelligence
+          Lapland AI Lab Demo Project – Arctic Intelligence v1.2
         </p>
       </div>
 
       <div className="prose prose-invert prose-slate max-w-none">
         <p>
-          <strong>MENA Tilannekuva</strong> on demonstraatio automaattisesta avoimien lähteiden tiedustelu (OSINT) -kojelaudasta. Se kerää, suodattaa ja visualisoi sotilaallisia ja diplomaattisia käänteitä Lähi-idän ja Pohjois-Afrikan alueella.
+          <strong>MENA Tilannekuva v1.2</strong> on demonstraatio automaattisesta avoimien lähteiden tiedustelu (OSINT) -kojelaudasta. Se kerää, suodattaa ja visualisoi sotilaallisia ja diplomaattisia käänteitä Lähi-idän ja Pohjois-Afrikan alueella.
         </p>
         
+        <h3>AI-Ominaisuudet (v1.2)</h3>
+        <ul className="list-none pl-0 space-y-2">
+          <li className="flex gap-3 bg-slate-900/30 p-3 rounded-lg border border-slate-800/50">
+            <Bot className="text-ice-blue min-w-[20px]" />
+            <span><strong>Virtuaalianalyytikko:</strong> Reaaliaikainen chat-assistentti, joka vastaa kysymyksiin tilannekuvasta.</span>
+          </li>
+          <li className="flex gap-3 bg-slate-900/30 p-3 rounded-lg border border-slate-800/50">
+            <Sparkles className="text-ice-blue min-w-[20px]" />
+            <span><strong>Kontekstianalyysi:</strong> Automaattinen selitys yksittäisten tapahtumien strategisesta merkityksestä.</span>
+          </li>
+        </ul>
+
         <h3>Datametodologia</h3>
         <p>
           Järjestelmä erottelee tiedustelutiedon kahteen luokkaan:
@@ -73,11 +124,6 @@ export default function AboutPage() {
             <span>Perustuu sosiaalisen median raportteihin, yksittäisiin väitteisiin tai loogiseen päättelyyn liittyvistä tapahtumista. Matalampi luottamus.</span>
           </li>
         </ul>
-
-        <h3>Rajoitukset</h3>
-        <p>
-          Tämä on <strong>demosovellus</strong>, joka käyttää staattista otosta datasta. Tuotantoympäristössä tämä olisi kytketty reaaliaikaiseen syöteputkeen (RSS, API, satelliittidata).
-        </p>
       </div>
 
       <Card className="border-amber-900/30 bg-amber-950/10 backdrop-blur-sm">
@@ -101,8 +147,8 @@ export default function AboutPage() {
               Lataa JSON
             </Button>
             <Button onClick={handleDownloadBrief} variant="outline" className="gap-2 border-slate-700 hover:bg-slate-800 text-slate-300">
-              <FileText size={16} />
-              Kopioi katsaus (MD)
+              <Sparkles size={16} className="text-ice-blue" />
+              Kopioi AI-katsaus
             </Button>
             <Button onClick={handleExportPDF} variant="outline" className="gap-2 border-slate-700 hover:bg-slate-800 text-slate-300">
               <FileText size={16} />

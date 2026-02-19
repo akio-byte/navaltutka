@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Map as MapIcon, Clock, BookOpen, Info, Menu, X, Search, Snowflake } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const navItems = [
   { href: '/', label: 'Tilannekuva', icon: LayoutDashboard },
@@ -17,8 +18,17 @@ const navItems = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setIsOpen(false);
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   return (
     <>
@@ -28,9 +38,12 @@ export function Navigation() {
           <Snowflake size={18} className="text-ice-blue" />
           <span>LAPLAND<span className="text-slate-500">AI</span></span>
         </div>
-        <button onClick={() => setIsOpen(!isOpen)} className="text-slate-400 hover:text-white">
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button onClick={() => setIsOpen(!isOpen)} className="text-slate-400 hover:text-white">
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -42,7 +55,7 @@ export function Navigation() {
             exit={{ opacity: 0, y: -20 }}
             className="absolute left-0 top-16 z-50 w-full border-b border-slate-800 bg-slate-950 p-4 shadow-2xl md:hidden"
           >
-            <div className="mb-4 relative">
+            <form onSubmit={handleSearch} className="mb-4 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
               <input 
                 type="text" 
@@ -51,7 +64,7 @@ export function Navigation() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </form>
             <nav className="flex flex-col space-y-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -80,15 +93,16 @@ export function Navigation() {
 
       {/* Desktop Sidebar */}
       <aside className="hidden w-64 flex-col border-r border-slate-800 bg-slate-950 md:flex">
-        <div className="flex h-16 items-center px-6 border-b border-slate-900/50">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-slate-900/50">
           <div className="flex items-center gap-2 font-mono text-sm font-bold tracking-wider text-slate-200">
             <Snowflake size={18} className="text-ice-blue" />
             <span>LAPLAND<span className="text-slate-500">AI</span></span>
           </div>
+          <ThemeToggle />
         </div>
         
         <div className="px-4 py-4">
-          <div className="relative">
+          <form onSubmit={handleSearch} className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
             <input 
               type="text" 
@@ -97,7 +111,7 @@ export function Navigation() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </form>
         </div>
         
         <nav className="flex-1 space-y-1 px-3 py-2">

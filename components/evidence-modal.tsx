@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { fi } from 'date-fns/locale';
 import { ExternalLink, Shield, MapPin, Clock } from 'lucide-react';
+import { ExplainButton } from '@/components/ai/explain-button';
 
 interface EvidenceModalProps {
   item: SnapshotItem | null;
@@ -41,6 +42,8 @@ export function EvidenceModal({ item, isOpen, onClose }: EvidenceModalProps) {
           <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
             <h4 className="text-sm font-semibold text-slate-300 mb-2">Yhteenveto</h4>
             <p className="text-slate-300 leading-relaxed">{item.summary}</p>
+            
+            <ExplainButton item={item} />
           </div>
 
           {/* Meta Grid */}

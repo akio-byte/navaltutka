@@ -5,6 +5,7 @@ import { SnapshotData, SnapshotItem } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EvidenceModal } from '@/components/evidence-modal';
+import { HorizonCard } from '@/components/ai/horizon-card';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { fi } from 'date-fns/locale';
 import { ArrowRight, Activity, ShieldAlert, Anchor, Plane, Globe, MessageSquare, Radio, Clock } from 'lucide-react';
@@ -36,9 +37,16 @@ export default function Dashboard() {
   const [data, setData] = useState<SnapshotData | null>(null);
   const [selectedItem, setSelectedItem] = useState<SnapshotItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [simulatedNow, setSimulatedNow] = useState(Date.now());
+  const [simulatedNow, setSimulatedNow] = useState<number>(0);
+  const [randomSeed, setRandomSeed] = useState(0);
 
   useEffect(() => {
+    // Initialize on mount to avoid SSR mismatch and satisfy linter
+    const initTimer = setTimeout(() => {
+      setSimulatedNow(Date.now());
+      setRandomSeed(Math.random());
+    }, 0);
+
     fetch('/api/snapshot')
       .then(res => res.json())
       .then(setData)
@@ -47,18 +55,22 @@ export default function Dashboard() {
     // Real-time simulation: Update "now" every 30s to show freshness
     const interval = setInterval(() => {
       setSimulatedNow(Date.now());
+      setRandomSeed(Math.random());
     }, 30000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initTimer);
+      clearInterval(interval);
+    };
   }, []);
 
-  if (!data) return <div className="p-8 text-slate-500 flex items-center gap-2"><div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div> Ladataan tilannekuvaa...</div>;
+  if (!data || simulatedNow === 0) return <div className="p-8 text-slate-500 flex items-center gap-2"><div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div> Ladataan tilannekuvaa...</div>;
 
   const lastUpdated = parseISO(data.generatedAtUtc);
   
   // Simulate one item being "just updated" randomly
   const displayItems = data.items.map((item, idx) => {
-    if (idx === 0 && Math.random() > 0.5) {
+    if (idx === 0 && randomSeed > 0.5) {
       return { ...item, timeWindow: { ...item.timeWindow, start: new Date(simulatedNow - 1000 * 60 * 5).toISOString() } };
     }
     return item;
@@ -83,6 +95,11 @@ export default function Dashboard() {
             Päivitetty {formatDistanceToNow(lastUpdated, { addSuffix: true, locale: fi })}
           </span>
         </div>
+      </div>
+
+      {/* AI Horizon Card */}
+      <div className="mb-8">
+        <HorizonCard snapshot={data} />
       </div>
 
       {/* Category Grid */}
