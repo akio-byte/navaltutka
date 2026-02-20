@@ -57,7 +57,7 @@ Only include IDs that are actually relevant. Max 30 IDs.
     const rawText = result.text || '';
     const jsonData = extractJson(rawText);
     
-    let validatedData: { ids: string[] } = { ids: [] };
+    let validatedData = { ids: [] };
     let warning = undefined;
 
     if (jsonData) {
