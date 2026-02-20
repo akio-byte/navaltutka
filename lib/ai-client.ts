@@ -1,31 +1,41 @@
-import { GoogleGenAI } from "@google/genai";
-
-// Simple in-memory cache for AI responses
-const aiCache = new Map<string, { response: string; timestamp: number }>();
+// Simple in-memory cache for AI responses on the client
+const aiCache = new Map<string, { response: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export const getGeminiClient = () => {
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-  if (!apiKey) {
-    return null;
+export interface AiResponse<T = string> {
+  ok: boolean;
+  requestId: string;
+  data?: T;
+  code?: string;
+  message?: string;
+  warning?: string;
+}
+
+export async function callAiApi<T = string>(
+  endpoint: 'chat' | 'horizon' | 'rank' | 'brief' | 'report',
+  payload: any
+): Promise<AiResponse<T>> {
+  try {
+    const res = await fetch(`/api/ai/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  } catch (error: any) {
+    return {
+      ok: false,
+      requestId: 'client-err',
+      code: 'FETCH_ERROR',
+      message: error.message,
+    };
   }
-  return new GoogleGenAI({ apiKey });
-};
+}
 
-export const SYSTEM_PROMPT = `
-You are a neutral Arctic intelligence analyst for Lapland AI Lab. 
-Your role is to analyze force posture in the MENA (Middle East & North Africa) region.
-- Be factual, concise, and objective.
-- Cite sources from the provided data.
-- Never speculate wildly; use "inferred" or "likely" for assessments.
-- Maintain a professional, calm, "Nordic" tone.
-- Format responses in Markdown.
-`;
-
-export async function cachedAiCall(
+export async function cachedAiCall<T = any>(
   key: string, 
-  generator: () => Promise<string | null>
-): Promise<string | null> {
+  generator: () => Promise<AiResponse<T>>
+): Promise<AiResponse<T>> {
   const now = Date.now();
   const cached = aiCache.get(key);
   
@@ -33,14 +43,9 @@ export async function cachedAiCall(
     return cached.response;
   }
 
-  try {
-    const response = await generator();
-    if (response) {
-      aiCache.set(key, { response, timestamp: now });
-    }
-    return response;
-  } catch (error) {
-    console.error("AI Call failed:", error);
-    return null;
+  const response = await generator();
+  if (response.ok) {
+    aiCache.set(key, { response, timestamp: now });
   }
+  return response;
 }

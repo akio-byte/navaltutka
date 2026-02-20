@@ -7,7 +7,7 @@ import { MessageSquare, X, Send, Sparkles, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { SnapshotData } from '@/lib/types';
-import { getGeminiClient, SYSTEM_PROMPT } from '@/lib/ai-client';
+import { callAiApi } from '@/lib/ai-client';
 
 export function AiAssistant() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,39 +42,17 @@ export function AiAssistant() {
     setIsLoading(true);
 
     try {
-      const client = getGeminiClient();
-      if (!client) {
-        throw new Error('AI client not configured');
-      }
-
-      const context = `
-Current Situation Snapshot (JSON):
-${JSON.stringify(snapshot?.items.slice(0, 15))}... (truncated for brevity)
-
-User Question: ${userMsg}
-
-Answer the user's question based strictly on the provided snapshot data. 
-If the answer is not in the data, state that clearly.
-Keep answers short (under 100 words) unless asked for a detailed report.
-`;
-
-      const result = await client.models.generateContent({
-        model: "gemini-3-flash-preview", // Using a stable model name
-        contents: [
-          { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + context }] }
-        ],
-      });
+      const context = `Current Situation Snapshot (JSON): ${JSON.stringify(snapshot?.items.slice(0, 15))}... (truncated)`;
+      const response = await callAiApi('chat', { message: userMsg, context });
       
-      const content = result.text;
-      
-      if (content) {
-        setMessages(prev => [...prev, { role: 'assistant', content }]);
+      if (response.ok && response.data) {
+        setMessages(prev => [...prev, { role: 'assistant', content: response.data as string }]);
       } else {
-        throw new Error('No response');
+        throw new Error(response.message || 'No response');
       }
     } catch (error) {
       console.error('Chat Error:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Pahoittelut, yhteysvirhe. Varmista että API-avain on asetettu.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Pahoittelut, yhteysvirhe. Analyytikko on tällä hetkellä tavoittamattomissa.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -119,9 +97,11 @@ Keep answers short (under 100 words) unless asked for a detailed report.
                         ? 'bg-ice-blue/10 text-ice-blue border border-ice-blue/20 rounded-br-none' 
                         : 'bg-slate-900 text-slate-300 border border-slate-800 rounded-bl-none'
                     }`}>
-                      <ReactMarkdown className="prose prose-invert prose-sm max-w-none">
-                        {msg.content}
-                      </ReactMarkdown>
+                      <div className="prose prose-invert prose-sm max-w-none">
+                        <ReactMarkdown>
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -6,7 +6,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { SnapshotItem } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { getGeminiClient, SYSTEM_PROMPT } from '@/lib/ai-client';
+import { callAiApi } from '@/lib/ai-client';
 
 export function ExplainButton({ item }: { item: SnapshotItem }) {
   const [explanation, setExplanation] = useState<string | null>(null);
@@ -17,37 +17,16 @@ export function ExplainButton({ item }: { item: SnapshotItem }) {
     
     setIsLoading(true);
     try {
-      const client = getGeminiClient();
-      if (!client) {
-        throw new Error('AI client not configured');
-      }
-
-      const prompt = `
-Analyze this specific intelligence item:
-Title: ${item.title}
-Summary: ${item.summary}
-Category: ${item.category}
-Sources: ${item.sources.map((s: any) => s.name).join(', ')}
-
-Explain:
-1. Why does this matter strategically?
-2. What is the potential escalation risk?
-3. Any historical context?
-
-Keep it under 3 sentences total. Concise.
-`;
-
-      const result = await client.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [
-          { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
-        ],
-      });
+      const response = await callAiApi('brief', { item });
       
-      setExplanation(result.text || "Analyysi epäonnistui.");
+      if (response.ok && response.data) {
+        setExplanation(response.data as string);
+      } else {
+        throw new Error(response.message || 'Analyysi epäonnistui.');
+      }
     } catch (error) {
       console.error(error);
-      setExplanation("Analyysi epäonnistui. Varmista API-avain.");
+      setExplanation("Analyysi epäonnistui. Palvelin on tällä hetkellä tavoittamattomissa.");
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +64,9 @@ Keep it under 3 sentences total. Concise.
               <Sparkles size={12} />
               Strateginen arvio
             </div>
-            <ReactMarkdown className="prose prose-invert prose-sm max-w-none leading-relaxed">
-              {explanation}
-            </ReactMarkdown>
+            <div className="prose prose-invert prose-sm max-w-none leading-relaxed">
+              <ReactMarkdown>{explanation}</ReactMarkdown>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

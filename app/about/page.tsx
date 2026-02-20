@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, FileText, AlertTriangle, Github, Snowflake, Bot, Sparkles } from 'lucide-react';
 import jsPDF from 'jspdf';
-import { getGeminiClient, SYSTEM_PROMPT } from '@/lib/ai-client';
+import { callAiApi } from '@/lib/ai-client';
 
 export default function AboutPage() {
   const handleDownloadSnapshot = () => {
@@ -16,48 +16,17 @@ export default function AboutPage() {
       const snapshotRes = await fetch('/api/snapshot');
       const snapshot = await snapshotRes.json();
 
-      const client = getGeminiClient();
-      if (!client) {
-        throw new Error('AI client not configured');
-      }
-
-      const prompt = `
-Generate a polished, professional Daily Intelligence Brief based on this snapshot data.
-Snapshot: ${JSON.stringify(snapshot.items.map((i: any) => ({ t: i.title, c: i.category, s: i.summary })))}
-
-Format:
-# Daily Intelligence Brief - [Date]
-
-## Executive Summary
-[2-3 sentences]
-
-## Key Developments
-- **[Category]**: [Detail]
-- ...
-
-## Strategic Assessment
-[1 paragraph]
-
-Tone: Nordic, calm, objective, professional. Language: Finnish.
-`;
-
-      const result = await client.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [
-          { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
-        ],
-      });
+      const response = await callAiApi('report', { snapshot });
       
-      const text = result.text;
-      if (text) {
-        await navigator.clipboard.writeText(text);
+      if (response.ok && response.data) {
+        await navigator.clipboard.writeText(response.data as string);
         alert('AI-generoitu päivittäiskatsaus kopioitu leikepöydälle!');
       } else {
-        throw new Error('No response');
+        throw new Error(response.message || 'No response');
       }
     } catch (e) {
       console.error(e);
-      alert('Kopiointi epäonnistui. Varmista API-avain.');
+      alert('Kopiointi epäonnistui. Palvelin on tällä hetkellä tavoittamattomissa.');
     }
   };
 

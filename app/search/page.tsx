@@ -9,7 +9,7 @@ import { EvidenceModal } from '@/components/evidence-modal';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { fi } from 'date-fns/locale';
 import { Loader2, Search as SearchIcon, ArrowRight } from 'lucide-react';
-import { getGeminiClient, SYSTEM_PROMPT, cachedAiCall } from '@/lib/ai-client';
+import { callAiApi, cachedAiCall } from '@/lib/ai-client';
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -29,43 +29,19 @@ function SearchContent() {
         const snapshotRes = await fetch('/api/snapshot');
         const snapshot = await snapshotRes.json();
 
-        const client = getGeminiClient();
-        if (!client) {
-          throw new Error('AI client not configured');
-        }
-
         const cacheKey = `search-${query}-${snapshot.generatedAtUtc}`;
 
-        const rankedIdsString = await cachedAiCall(cacheKey, async () => {
-          const prompt = `
-User Query: "${query}"
-
-Items:
-${JSON.stringify(snapshot.items.map((i: any) => ({ id: i.id, t: i.title, s: i.summary, tags: i.tags })))}
-
-Task: Rank the items based on relevance to the user query.
-Return ONLY a JSON array of Item IDs in order of relevance. Example: ["item-002", "item-005"].
-If no items are relevant, return [].
-`;
-
-          const result = await client.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: [
-              { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
-            ],
-          });
-          
-          const text = result.text;
-          // Clean up markdown code blocks if present
-          return text?.replace(/```json/g, '').replace(/```/g, '').trim() || null;
+        const response = await cachedAiCall<{ ids: string[] }>(cacheKey, async () => {
+          const itemsMini = snapshot.items.map((i: any) => ({ 
+            id: i.id, 
+            t: i.title, 
+            s: i.summary, 
+            tags: i.tags 
+          }));
+          return await callAiApi<{ ids: string[] }>('rank', { query, itemsMini });
         });
 
-        let rankedIds: string[] = [];
-        try {
-          rankedIds = JSON.parse(rankedIdsString || '[]');
-        } catch (e) {
-          console.error("Failed to parse AI search results", e);
-        }
+        const rankedIds = response.data?.ids || [];
 
         const filteredResults = rankedIds
           .map(id => snapshot.items.find((item: any) => item.id === id))
