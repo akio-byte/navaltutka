@@ -33,6 +33,26 @@ export function AiAssistant() {
     }
   }, [messages, isOpen]);
 
+  const compactContext = (data: SnapshotData | null) => {
+    if (!data) return '';
+    
+    const items = data.items.slice(0, 10).map(item => ({
+      id: item.id,
+      category: item.category,
+      title: item.title,
+      summaryShort: item.summary.substring(0, 240),
+      timeStartUtc: item.timeWindow.start,
+      sources: item.sources?.map(s => ({
+        name: s.name,
+        url: s.url,
+        publishedAtUtc: s.publishedAtUtc
+      })) || []
+    }));
+
+    const contextStr = JSON.stringify(items);
+    return contextStr.length > 12000 ? contextStr.substring(0, 12000) : contextStr;
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -42,7 +62,7 @@ export function AiAssistant() {
     setIsLoading(true);
 
     try {
-      const context = `Current Situation Snapshot (JSON): ${JSON.stringify(snapshot?.items.slice(0, 15))}... (truncated)`;
+      const context = compactContext(snapshot);
       const response = await callAiApi('chat', { message: userMsg, context });
       
       if (response.ok && response.data) {

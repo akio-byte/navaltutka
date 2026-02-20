@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, extractJson } from '@/lib/ai-server';
+import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, extractJson, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const RankInputSchema = z.object({
@@ -18,7 +18,7 @@ const RankOutputSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+  const ip = getIp(req);
 
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ ok: false, requestId, code: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests' }, { status: 429 });
@@ -30,7 +30,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, requestId, code: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 30KB' }, { status: 413 });
     }
 
-    const { query, itemsMini } = RankInputSchema.parse(body);
+    const parsedInput = RankInputSchema.safeParse(body);
+    if (!parsedInput.success) {
+      return NextResponse.json({ ok: false, requestId, code: 'INVALID_INPUT', message: parsedInput.error.message }, { status: 400 });
+    }
+
+    const { query, itemsMini } = parsedInput.data;
     const client = getGeminiServerClient();
 
     const prompt = `

@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit } from '@/lib/ai-server';
+import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const ReportInputSchema = z.object({
   snapshot: z.any(),
+  externalEvidence: z.array(z.object({
+    title: z.string(),
+    url: z.string(),
+    snippet: z.string(),
+    publishedAtUtc: z.string().nullable().optional(),
+  })).optional(),
 });
 
 export async function POST(req: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+  const ip = getIp(req);
 
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ ok: false, requestId, code: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests' }, { status: 429 });
@@ -20,12 +26,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, requestId, code: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 30KB' }, { status: 413 });
     }
 
-    const { snapshot } = ReportInputSchema.parse(body);
+    const parsed = ReportInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, requestId, code: 'INVALID_INPUT', message: parsed.error.message }, { status: 400 });
+    }
+
+    const { snapshot, externalEvidence } = parsed.data;
     const client = getGeminiServerClient();
 
     const prompt = `
-Generate a polished, professional Daily Intelligence Brief based on this snapshot data.
-Snapshot: ${JSON.stringify(snapshot.items.map((i: any) => ({ t: i.title, c: i.category, s: i.summary })))}
+Generate a polished, professional Daily Intelligence Brief based on this snapshot data and external evidence.
+
+Every factual claim must have at least one source citation from the provided data or external evidence.
+AI must cite only provided URLs. If no sources support a claim, state "insufficient sources".
+Output format: Markdown with a short section "Sources" listing numbered links.
+
+Snapshot: ${JSON.stringify(snapshot.items.map((i: any) => ({ 
+      t: i.title, 
+      c: i.category, 
+      s: i.summary,
+      sources: i.sources?.map((s: any) => ({ n: s.name, u: s.url, d: s.publishedAtUtc })) || []
+    })))}
+
+${externalEvidence ? `External Evidence: ${JSON.stringify(externalEvidence)}` : ''}
 
 Format:
 # Daily Intelligence Brief - [Date]

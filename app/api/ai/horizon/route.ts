@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit } from '@/lib/ai-server';
+import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const HorizonInputSchema = z.object({
@@ -8,7 +8,7 @@ const HorizonInputSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
-  const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+  const ip = getIp(req);
 
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ ok: false, requestId, code: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests' }, { status: 429 });
@@ -20,7 +20,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, requestId, code: 'PAYLOAD_TOO_LARGE', message: 'Payload exceeds 30KB' }, { status: 413 });
     }
 
-    const { snapshot } = HorizonInputSchema.parse(body);
+    const parsed = HorizonInputSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, requestId, code: 'INVALID_INPUT', message: parsed.error.message }, { status: 400 });
+    }
+
+    const { snapshot } = parsed.data;
     const client = getGeminiServerClient();
 
     const prompt = `
@@ -30,7 +35,14 @@ Focus on:
 2. Likely movements in the next 48h.
 3. Diplomatic openings.
 
-Data: ${JSON.stringify(snapshot.items.map((i: any) => ({ t: i.title, s: i.summary })))}
+Every factual claim must have at least one source citation from the provided data.
+Output format: Markdown with a short section "Sources" listing numbered links.
+
+Data: ${JSON.stringify(snapshot.items.map((i: any) => ({ 
+      t: i.title, 
+      s: i.summary,
+      sources: i.sources?.map((s: any) => ({ n: s.name, u: s.url, d: s.publishedAtUtc })) || []
+    })))}
 `;
 
     const result = await client.models.generateContent({
