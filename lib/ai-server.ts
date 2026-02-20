@@ -1,4 +1,4 @@
-import { GoogleGenAI, type GenerateContentParameters } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 export const getGeminiServerClient = () => {
@@ -10,76 +10,6 @@ export const getGeminiServerClient = () => {
   
   return new GoogleGenAI({ apiKey });
 };
-
-
-
-const GEMINI_TIMEOUT_MS = 15000;
-
-export type UpstreamErrorCode =
-  | "UPSTREAM_MISSING_KEY"
-  | "UPSTREAM_AUTH_INVALID"
-  | "UPSTREAM_TIMEOUT"
-  | "UPSTREAM_RATE_LIMIT"
-  | "UPSTREAM_ERROR";
-
-export function normalizeGeminiError(error: unknown): UpstreamErrorCode {
-  if (error instanceof Error && error.message === "UPSTREAM_MISSING_KEY") {
-    return "UPSTREAM_MISSING_KEY";
-  }
-
-  const err = error as {
-    status?: number;
-    code?: number | string;
-    message?: string;
-    name?: string;
-  };
-
-  if (err?.name === "AbortError") {
-    return "UPSTREAM_TIMEOUT";
-  }
-
-  if (err?.status === 401 || err?.status === 403) {
-    return "UPSTREAM_AUTH_INVALID";
-  }
-
-  if (err?.status === 429) {
-    return "UPSTREAM_RATE_LIMIT";
-  }
-
-  const msg = (err?.message || "").toLowerCase();
-  if (msg.includes("timeout") || msg.includes("timed out")) {
-    return "UPSTREAM_TIMEOUT";
-  }
-  if (msg.includes("invalid api key") || msg.includes("api key not valid") || msg.includes("permission denied") || msg.includes("unauthorized") || msg.includes("forbidden")) {
-    return "UPSTREAM_AUTH_INVALID";
-  }
-  if (msg.includes("rate limit") || msg.includes("quota")) {
-    return "UPSTREAM_RATE_LIMIT";
-  }
-
-  return "UPSTREAM_ERROR";
-}
-
-export async function generateGeminiContent(params: GenerateContentParameters) {
-  const client = getGeminiServerClient();
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
-
-  try {
-    return await client.models.generateContent({
-      ...params,
-      config: {
-        ...(params.config || {}),
-        abortSignal: controller.signal,
-      },
-    });
-  } catch (error) {
-    const code = normalizeGeminiError(error);
-    throw new Error(code);
-  } finally {
-    clearTimeout(timeout);
-  }
-}
 
 export const SYSTEM_PROMPT = `
 You are a neutral Arctic intelligence analyst for Lapland AI Lab. 

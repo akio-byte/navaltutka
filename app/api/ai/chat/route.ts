@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateGeminiContent, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
+import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const ChatInputSchema = z.object({
@@ -27,7 +27,9 @@ export async function POST(req: NextRequest) {
     }
 
     const { message, context } = parsed.data;
-    const result = await generateGeminiContent({
+    const client = getGeminiServerClient();
+
+    const result = await client.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
         { role: "user", parts: [{ text: SYSTEM_PROMPT + (context ? `\nContext: ${context}` : '') + `\n\nUser Message: ${message}` }] }
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, requestId, data: result.text });
   } catch (error: any) {
     console.error(`[Chat API Error] ${requestId}:`, error);
-    const code = (typeof error?.message === 'string' && error.message.startsWith('UPSTREAM_')) ? error.message : 'INTERNAL_ERROR';
+    const code = error.message === 'UPSTREAM_MISSING_KEY' ? 'UPSTREAM_MISSING_KEY' : 'INTERNAL_ERROR';
     return NextResponse.json({ ok: false, requestId, code, message: error.message }, { status: 500 });
   }
 }

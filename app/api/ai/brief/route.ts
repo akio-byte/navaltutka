@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateGeminiContent, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
+import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const BriefInputSchema = z.object({
@@ -26,6 +26,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { item } = parsed.data;
+    const client = getGeminiServerClient();
+
     const prompt = `
 Provide a deep-dive tactical briefing on the following event.
 Explain the strategic significance, potential escalatory risks, and historical context if applicable.
@@ -40,7 +42,7 @@ Location: ${item.location?.name}
 Sources: ${JSON.stringify(item.sources?.map((s: any) => ({ n: s.name, u: s.url, d: s.publishedAtUtc })) || [])}
 `;
 
-    const result = await generateGeminiContent({
+    const result = await client.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
         { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
@@ -50,7 +52,7 @@ Sources: ${JSON.stringify(item.sources?.map((s: any) => ({ n: s.name, u: s.url, 
     return NextResponse.json({ ok: true, requestId, data: result.text });
   } catch (error: any) {
     console.error(`[Brief API Error] ${requestId}:`, error);
-    const code = (typeof error?.message === 'string' && error.message.startsWith('UPSTREAM_')) ? error.message : 'INTERNAL_ERROR';
+    const code = error.message === 'UPSTREAM_MISSING_KEY' ? 'UPSTREAM_MISSING_KEY' : 'INTERNAL_ERROR';
     return NextResponse.json({ ok: false, requestId, code, message: error.message }, { status: 500 });
   }
 }

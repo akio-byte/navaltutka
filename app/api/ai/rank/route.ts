@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateGeminiContent, SYSTEM_PROMPT, checkRateLimit, extractJson, getIp } from '@/lib/ai-server';
+import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, extractJson, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const RankInputSchema = z.object({
@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { query, itemsMini } = parsedInput.data;
+    const client = getGeminiServerClient();
+
     const prompt = `
 User Query: "${query}"
 Items: ${JSON.stringify(itemsMini)}
@@ -45,7 +47,7 @@ Return ONLY minified JSON with the following structure: {"ids": ["item-id-1", "i
 Only include IDs that are actually relevant. Max 30 IDs.
 `;
 
-    const result = await generateGeminiContent({
+    const result = await client.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: [
         { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
@@ -55,7 +57,7 @@ Only include IDs that are actually relevant. Max 30 IDs.
     const rawText = result.text || '';
     const jsonData = extractJson(rawText);
     
-    let validatedData: { ids: string[] } = { ids: [] };
+    let validatedData = { ids: [] };
     let warning = undefined;
 
     if (jsonData) {
@@ -74,7 +76,7 @@ Only include IDs that are actually relevant. Max 30 IDs.
     return NextResponse.json({ ok: true, requestId, data: validatedData, warning });
   } catch (error: any) {
     console.error(`[Rank API Error] ${requestId}:`, error);
-    const code = (typeof error?.message === 'string' && error.message.startsWith('UPSTREAM_')) ? error.message : 'INTERNAL_ERROR';
+    const code = error.message === 'UPSTREAM_MISSING_KEY' ? 'UPSTREAM_MISSING_KEY' : 'INTERNAL_ERROR';
     return NextResponse.json({ ok: false, requestId, code, message: error.message }, { status: 500 });
   }
 }
