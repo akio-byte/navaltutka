@@ -6,12 +6,15 @@ import { SnapshotData } from '@/lib/types';
 // Simple in-memory cache
 let cache: { data: SnapshotData; timestamp: number } | null = null;
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const SNAPSHOT_CACHE_CONTROL = 'public, s-maxage=60, stale-while-revalidate=3600';
 
 export async function GET() {
   const now = Date.now();
-  
-  if (cache && (now - cache.timestamp < CACHE_TTL)) {
-    return NextResponse.json(cache.data);
+
+  if (cache && now - cache.timestamp < CACHE_TTL) {
+    const response = NextResponse.json(cache.data);
+    response.headers.set('Cache-Control', SNAPSHOT_CACHE_CONTROL);
+    return response;
   }
 
   try {
@@ -23,8 +26,7 @@ export async function GET() {
     cache = { data, timestamp: now };
 
     const response = NextResponse.json(data);
-    // s-maxage: 60s (CDN cache), stale-while-revalidate: 3600s (serve stale while updating)
-    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+    response.headers.set('Cache-Control', SNAPSHOT_CACHE_CONTROL);
     return response;
   } catch (error) {
     console.error('Error reading snapshot data:', error);
