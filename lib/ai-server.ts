@@ -2,17 +2,13 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 export const getGeminiServerClient = () => {
-  // Try all possible platform-injected keys
-  const key = 
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY || 
-    process.env.GEMINI_API_KEY || 
-    process.env.API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!key) {
+  if (!apiKey) {
     throw new Error("UPSTREAM_MISSING_KEY");
   }
   
-  return new GoogleGenAI({ apiKey: key });
+  return new GoogleGenAI({ apiKey });
 };
 
 export const SYSTEM_PROMPT = `
