@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiServerClient, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
+import { generateGeminiContent, SYSTEM_PROMPT, checkRateLimit, getIp } from '@/lib/ai-server';
 import { z } from 'zod';
 
 const HorizonInputSchema = z.object({
@@ -26,8 +26,6 @@ export async function POST(req: NextRequest) {
     }
 
     const { snapshot } = parsed.data;
-    const client = getGeminiServerClient();
-
     const prompt = `
 Based on the current naval and air force posture data provided below, generate a 3-point "Strategic Horizon" assessment.
 Focus on:
@@ -45,7 +43,7 @@ Data: ${JSON.stringify(snapshot.items.map((i: any) => ({
     })))}
 `;
 
-    const result = await client.models.generateContent({
+    const result = await generateGeminiContent({
       model: "gemini-3-flash-preview",
       contents: [
         { role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + prompt }] }
@@ -55,7 +53,7 @@ Data: ${JSON.stringify(snapshot.items.map((i: any) => ({
     return NextResponse.json({ ok: true, requestId, data: result.text });
   } catch (error: any) {
     console.error(`[Horizon API Error] ${requestId}:`, error);
-    const code = error.message === 'UPSTREAM_MISSING_KEY' ? 'UPSTREAM_MISSING_KEY' : 'INTERNAL_ERROR';
+    const code = (typeof error?.message === 'string' && error.message.startsWith('UPSTREAM_')) ? error.message : 'INTERNAL_ERROR';
     return NextResponse.json({ ok: false, requestId, code, message: error.message }, { status: 500 });
   }
 }
